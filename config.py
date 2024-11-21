@@ -14,4 +14,5 @@ FUNCTIONAL_DESCRIPTION: str = """\tПросмотреть список всех 
 \tДобавить книгу: /add
 \tУдалить книгу: /delete
 \tПоиск книги: /search
-\tИзменить статус книги: /change-status"""
+\tИзменить статус книги: /change-status
+\tВыйти из приложения: /exit"""

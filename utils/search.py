@@ -18,7 +18,6 @@ class Search:
         self._conjunction_patterns = []
         self._compile_pattern(values)
         if self._conjunction_patterns or self._default_pattern:
-            print(self._default_pattern)
             for book in self._books:
                 if self._search_in_book(self._default_pattern, book):
                     self._searched_books.append(book)
@@ -56,7 +55,6 @@ class Search:
         escaped_strings = []
         for string in values:
             conjunction_request = string.split('&&&')
-            print(conjunction_request, len(conjunction_request))
             if len(conjunction_request) > 1:
                 self._compile_conjunction_pattern(conjunction_request)
             else:

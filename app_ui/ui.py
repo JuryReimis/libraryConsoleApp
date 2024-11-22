@@ -1,3 +1,5 @@
+import pprint
+
 from app_orm.ORM import BooksManager
 from config import HELLO_MESSAGE, FUNCTIONAL_DESCRIPTION
 from utils.search import Search
@@ -21,7 +23,12 @@ class UserInterface:
             case '/add':
                 self.add_book()
             case '/all':
-                print("Показать список всех книг")
+                books = BooksManager().get_all_books()
+                if books:
+                    print(*[pprint.pformat(book, sort_dicts=False, indent=4) for book in books], sep='\n')
+                else:
+                    print("В библиотеке нет книг")
+                self.request_action()
             case '/delete':
                 print("Удалить книгу")
             case '/search':

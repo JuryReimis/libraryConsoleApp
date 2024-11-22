@@ -1,5 +1,7 @@
+from app_orm.ORM import BooksManager
 from config import HELLO_MESSAGE, FUNCTIONAL_DESCRIPTION
 from utils.search import Search
+from validators.add_book_validator import AddBookValidator
 
 
 class UserInterface:
@@ -17,7 +19,7 @@ class UserInterface:
         match action:
 
             case '/add':
-                print("Добавление книги")
+                self.add_book()
             case '/all':
                 print("Показать список всех книг")
             case '/delete':
@@ -35,8 +37,19 @@ class UserInterface:
     def add_book(self):
         print("Для добавления книги последовательно введите название, автора и год издания")
         title = str(input('Введите название книги: '))
+        search = Search()
+        search.init_search([title])
+        print('Здесь предупреждение, что книга с таким названием уже имеется', search.get_searched_books())
         author = str(input('Введите автора книги: '))
-        year = int(input('Введите год издания: '))
+        year = str(input('Введите год издания: '))
+        validation = AddBookValidator(title, author, year)
+        errors = validation.validate()
+
+        if not errors:
+            BooksManager().add_new_book(title, author, year)
+        else:
+            print('Произошла ошибка при добавлении книги в базу данных', *errors, sep='\n')
+        self.request_action()
 
     def search_book(self):
         print(r"""Введите название книги, автора или год издания.

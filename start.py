@@ -1,10 +1,12 @@
-from pathlib import Path
-
-import config
+from app_ui.ui import UserInterface
+from validators.run_validator import RunValidator
 
 
 def run_app():
-    print(Path(config.DATA_BASE_FILE))
+    RunValidator.check_db()
+    RunValidator.check_last_generated_pk()
+
+    ui = UserInterface()
 
 
 if __name__ == "__main__":

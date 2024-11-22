@@ -42,8 +42,8 @@ class RunValidator:
                 max_pk = max([book.get('id') for book in books])
                 service_data = ORM.get_data(service_file)
                 if service_data:
-                    last_pk = service_data.get('last_generated_pk')
-                if last_pk:
+                    last_pk = service_data.get('last_generated_pk', None)
+                if last_pk is not None:
                     if last_pk != max_pk:
                         service_data['last_generated_pk'] = max_pk
                         ORM.dump_data(service_file, service_data)

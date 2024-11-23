@@ -34,9 +34,9 @@ class UserInterface:
             case '/change-status':
                 self.change_status()
             case '/exit':
-                print("Всего доброго, спасибо за работу!")
+                print("\nВсего доброго, спасибо за работу!\n")
             case _:
-                print("Команда не распознана, повторите попытку")
+                print("\nКоманда не распознана, повторите попытку\n")
                 self.request_action()
 
     def all(self):

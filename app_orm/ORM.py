@@ -1,4 +1,5 @@
 import json
+# import threading
 from pathlib import Path
 
 from config import DATA_BASE_LIBRARY_PATH, DATA_BASE_SERVICE_PATH
@@ -29,18 +30,28 @@ class ORM:
         self.dump_data(DATA_BASE_SERVICE_PATH, new_service_data)
 
 
+# def _synchronized(func):
+#     def wrapped(self, *args, **kwargs):
+#         with self._lock:
+#             return func(self, *args, **kwargs)
+#     return wrapped
+
+
 class BooksManager(ORM):
+    _library: dict = dict()
+    # _lock: threading.Lock = threading.Lock()
 
     def __init__(self):
         self._library_db: Path = DATA_BASE_LIBRARY_PATH
         self._service_db: Path = DATA_BASE_SERVICE_PATH
-        self._library: dict = dict()
 
+    # @_synchronized
     def get_all_books(self) -> dict:
         if not self._library:
             self._library = self.get_data(self._library_db)
         return self._library.get('books')
 
+    # @_synchronized
     def add_new_book(self, title: str, author: str, year: str):
         last_pk = self.get_service_data().get('last_generated_pk')
         new_book = {
@@ -60,6 +71,7 @@ class BooksManager(ORM):
         else:
             self.update_last_pk()
 
+    # @_synchronized
     def delete_books(self, ids: list[str]) -> bool:
         try:
             books = self.get_all_books()

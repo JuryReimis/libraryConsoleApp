@@ -92,6 +92,18 @@ class BooksManager(ORM):
             print('Произошла ошибка', error, sep='\n')
             return False
 
+    def update_status(self, pk: str, new_status: str) -> str | None:
+        try:
+            books = self.get_all_books()
+            book = books.get(pk)
+            book['status'] = new_status
+            self._library['books'] = books
+            self.update_library_db()
+        except Exception as error:
+            return f"Произошла ошибка, просьба обратиться в технический отдел\n{error}"
+        else:
+            return None
+
     def update_library_db(self):
         self.dump_data(self._library_db, self._library)
 

@@ -1,17 +1,17 @@
-import pprint
-
-from actions.library_actions import Action
-from app_orm.ORM import BooksManager
+from actions.library_actions import Action, ChangeStatusAction, AddBookAction, SearchBooksAction, DeleteBooksByIdAction
 from config import HELLO_MESSAGE, FUNCTIONAL_DESCRIPTION
-from utils.search import Search
-from validators.add_book_validator import AddBookValidator
 
 
 class UserInterface:
 
-    def __init__(self):
-        self.__books_manager = BooksManager()
+    def __init__(self, localization: str = "RU"):
+
+        # Actions:
         self.__action = Action()
+        self.__add_book_action = None
+        self.__search_book_action = None
+        self.__delete_book_action = None
+        self.__change_status_action = None
 
         print(HELLO_MESSAGE, '\n')
         self.request_action()
@@ -40,51 +40,47 @@ class UserInterface:
                 self.request_action()
 
     def all(self):
-        books: dict.values = self.__books_manager.get_all_books().values()
-        if books:
-            print(*[pprint.pformat(book, sort_dicts=False, indent=4) for book in books], sep='\n')
-        else:
-            print("В библиотеке нет книг")
+        message, response = Action().get_all_books()
+        print(message)
         self.request_action()
 
     def add_book(self):
+        self.__add_book_action = AddBookAction()
+        print()
         print("Для добавления книги последовательно введите название, автора и год издания")
         title = str(input('Введите название книги: '))
-        search = Search()
-        search.init_search([title])
-        print('Здесь предупреждение, что книга с таким названием уже имеется', search.get_searched_books())
+        message, response = self.__add_book_action.input_title(title)
+        if response is False:
+            print(message)
         author = str(input('Введите автора книги: '))
         year = str(input('Введите год издания: '))
-        validation = AddBookValidator(title, author, year)
-        errors = validation.validate()
-
-        if not errors:
-            self.__books_manager.add_new_book(title, author, year.replace('BC', 'до н.э.'))
-        else:
-            print('Произошла ошибка при добавлении книги в базу данных', *errors, sep='\n')
+        message, response = self.__add_book_action.add_book(author, year)
+        print(message)
         self.request_action()
 
     def search_book(self):
-        print(r"""Введите название книги, автора или год издания.
+        print("""\nВведите название книги, автора или год издания.
          Можете указать несколько значений, разделяя их `;` для глобального поиска
          Например: Мартин; 1980; Хроники Войны; Прокопий""")
-        strings = input("Что ищем: ").split(';')
-        search = Search()
-        search.init_search(strings)
-        print(search.get_searched_books())
+        query = input("Что ищем: ")
+        self.__search_book_action = SearchBooksAction(query)
+        message, response = self.__search_book_action.search()
+        print(message)
         self.request_action()
 
     def delete(self):
-        ids: list[str] = list(map(lambda pk: pk.strip(), input('Введите id тех книг, которые вы хотите удалить. Разделяйте их запятыми: ').split(
-                           ',')))
-        result = self.__books_manager.delete_books(ids)
-        if not result:
-            print("Удаление пошло не по плану, обратитесь в технический отдел\n")
+        print()
+        ids: str = input('Введите id тех книг, которые вы хотите удалить. Разделяйте их запятыми: ')
+        self.__delete_book_action = DeleteBooksByIdAction(ids)
+        message, response = self.__delete_book_action.delete()
+        print(message)
         self.request_action()
 
     def change_status(self):
-        book_id = input('Введите id книги, статус которой хотите поменять').strip()
-        message, response = self.__action.get_changing_book(book_id)
+        print()
+        book_id = input('Введите id книги, статус которой хотите поменять: ').strip()
+        self.__change_status_action = ChangeStatusAction(book_id)
+        message, response = self.__change_status_action.get_changing_book()
         if response:
             print(message)
             self.input_status()
@@ -93,12 +89,12 @@ class UserInterface:
             self.change_status()
 
     def input_status(self):
-        new_status = input('Введите новый статус').strip()
-        message, response = self.__action.change_status(new_status)
+        print()
+        new_status = input('Введите новый статус: ').strip().lower()
+        message, response = self.__change_status_action.change_status(new_status)
         if response is True:
             print(message)
             self.request_action()
         else:
-            print(message),
+            print(message)
             self.input_status()
-

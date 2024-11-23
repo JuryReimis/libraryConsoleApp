@@ -1,5 +1,6 @@
 import pprint
 
+from actions.library_actions import Action
 from app_orm.ORM import BooksManager
 from config import HELLO_MESSAGE, FUNCTIONAL_DESCRIPTION
 from utils.search import Search
@@ -9,6 +10,8 @@ from validators.add_book_validator import AddBookValidator
 class UserInterface:
 
     def __init__(self):
+        self.__books_manager = BooksManager()
+        self.__action = Action()
 
         print(HELLO_MESSAGE, '\n')
         self.request_action()
@@ -29,7 +32,7 @@ class UserInterface:
             case '/search':
                 self.search_book()
             case '/change-status':
-                print("Сменить статус книги")
+                self.change_status()
             case '/exit':
                 print("Всего доброго, спасибо за работу!")
             case _:
@@ -37,7 +40,7 @@ class UserInterface:
                 self.request_action()
 
     def all(self):
-        books: dict.values = BooksManager().get_all_books().values()
+        books: dict.values = self.__books_manager.get_all_books().values()
         if books:
             print(*[pprint.pformat(book, sort_dicts=False, indent=4) for book in books], sep='\n')
         else:
@@ -56,7 +59,7 @@ class UserInterface:
         errors = validation.validate()
 
         if not errors:
-            BooksManager().add_new_book(title, author, year.replace('BC', 'до н.э.'))
+            self.__books_manager.add_new_book(title, author, year.replace('BC', 'до н.э.'))
         else:
             print('Произошла ошибка при добавлении книги в базу данных', *errors, sep='\n')
         self.request_action()
@@ -74,8 +77,28 @@ class UserInterface:
     def delete(self):
         ids: list[str] = list(map(lambda pk: pk.strip(), input('Введите id тех книг, которые вы хотите удалить. Разделяйте их запятыми: ').split(
                            ',')))
-        books_manager = BooksManager()
-        result = books_manager.delete_books(ids)
+        result = self.__books_manager.delete_books(ids)
         if not result:
             print("Удаление пошло не по плану, обратитесь в технический отдел\n")
         self.request_action()
+
+    def change_status(self):
+        book_id = input('Введите id книги, статус которой хотите поменять').strip()
+        message, response = self.__action.get_changing_book(book_id)
+        if response:
+            print(message)
+            self.input_status()
+        else:
+            print(message)
+            self.change_status()
+
+    def input_status(self):
+        new_status = input('Введите новый статус').strip()
+        message, response = self.__action.change_status(new_status)
+        if response is True:
+            print(message)
+            self.request_action()
+        else:
+            print(message),
+            self.input_status()
+

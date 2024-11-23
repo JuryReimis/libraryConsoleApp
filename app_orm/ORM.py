@@ -59,7 +59,7 @@ class BooksManager(ORM):
             'title': title,
             'author': author,
             'year': year,
-            'status': 'В наличии'
+            'status': 'в наличии'
         }
         books = self.get_all_books()
         books[str(last_pk + 1)] = new_book
@@ -80,11 +80,7 @@ class BooksManager(ORM):
             for i in ids:
                 deleted_book: dict | None = books.pop(i, None)
                 if deleted_book:
-                    deleted_books.append(f'''Удалена книга 
-                    id: {deleted_book.get('id')} 
-                    Название: {deleted_book.get('title')}
-                    Автор: {deleted_book.get('author')}
-                    Год издания: {deleted_book.get('year')}''')
+                    deleted_books.append(deleted_book)
                 else:
                     not_exist_books.append(f'''Попытка удалить несуществующую книгу с id {i}''')
             self._library['books'] = books

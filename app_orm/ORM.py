@@ -54,14 +54,34 @@ class BooksManager(ORM):
         books[str(last_pk + 1)] = new_book
         self._library['books'] = books
         try:
-            self.dump_data(DATA_BASE_LIBRARY_PATH, self._library)
+            self.update_library_db()
         except Exception as error:
             print("Произошла ошибка при добавлении книги, обратитесь в технический отдел.", error)
         else:
             self.update_last_pk()
 
-    def delete_books(self, ids: list[int]) -> bool:
-        pass
+    def delete_books(self, ids: list[str]) -> bool:
+        try:
+            books = self.get_all_books()
+            for i in ids:
+                deleted_book: dict | None = books.pop(i, None)
+                if deleted_book:
+                    print(f'''Удалена книга 
+                    id: {deleted_book.get('id')} 
+                    Название: {deleted_book.get('title')}
+                    Автор: {deleted_book.get('author')}
+                    Год издания: {deleted_book.get('year')}''')
+                else:
+                    print(f'''Попытка удалить несуществующую книгу с id {i}''')
+            self._library['books'] = books
+            self.update_library_db()
+            return True
+        except Exception as error:
+            print('Произошла ошибка', error, sep='\n')
+            return False
+
+    def update_library_db(self):
+        self.dump_data(self._library_db, self._library)
 
     def update_last_pk(self):
         service_data = self.get_service_data()

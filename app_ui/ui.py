@@ -16,21 +16,16 @@ class UserInterface:
     def request_action(self):
         print(FUNCTIONAL_DESCRIPTION, '\n')
 
-        action: str = str(input('Что вы хотите сделать? Введите команду: ',)).lower()
+        action: str = str(input('Что вы хотите сделать? Введите команду: ', )).lower().strip()
 
         match action:
 
             case '/add':
                 self.add_book()
             case '/all':
-                books = BooksManager().get_all_books()
-                if books:
-                    print(*[pprint.pformat(book, sort_dicts=False, indent=4) for book in books], sep='\n')
-                else:
-                    print("В библиотеке нет книг")
-                self.request_action()
+                self.all()
             case '/delete':
-                print("Удалить книгу")
+                self.delete()
             case '/search':
                 self.search_book()
             case '/change-status':
@@ -40,6 +35,14 @@ class UserInterface:
             case _:
                 print("Команда не распознана, повторите попытку")
                 self.request_action()
+
+    def all(self):
+        books: dict.values = BooksManager().get_all_books().values()
+        if books:
+            print(*[pprint.pformat(book, sort_dicts=False, indent=4) for book in books], sep='\n')
+        else:
+            print("В библиотеке нет книг")
+        self.request_action()
 
     def add_book(self):
         print("Для добавления книги последовательно введите название, автора и год издания")
@@ -53,7 +56,7 @@ class UserInterface:
         errors = validation.validate()
 
         if not errors:
-            BooksManager().add_new_book(title, author, year)
+            BooksManager().add_new_book(title, author, year.replace('BC', 'до н.э.'))
         else:
             print('Произошла ошибка при добавлении книги в базу данных', *errors, sep='\n')
         self.request_action()
@@ -68,4 +71,11 @@ class UserInterface:
         print(search.get_searched_books())
         self.request_action()
 
-
+    def delete(self):
+        ids: list[str] = list(map(lambda pk: pk.strip(), input('Введите id тех книг, которые вы хотите удалить. Разделяйте их запятыми: ').split(
+                           ',')))
+        books_manager = BooksManager()
+        result = books_manager.delete_books(ids)
+        if not result:
+            print("Удаление пошло не по плану, обратитесь в технический отдел\n")
+        self.request_action()

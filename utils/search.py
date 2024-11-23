@@ -66,7 +66,7 @@ class Search:
             self._default_pattern = None
 
     def _compile_conjunction_pattern(self, strings: list) -> None:
-        patterns = [re.compile(re.escape(string)) for string in strings]
+        patterns = [re.compile(re.escape(string), re.IGNORECASE) for string in strings]
         self._conjunction_patterns.append(patterns)
 
     @staticmethod

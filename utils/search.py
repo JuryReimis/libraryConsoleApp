@@ -8,7 +8,7 @@ class Search:
     def __init__(self):
         self._books_manager = BooksManager()
         self._searched_books: [dict] = []
-        self._books: [dict] = self._books_manager.get_all_books()
+        self._books: [dict] = self._books_manager.get_all_books().values()
 
         self._default_pattern: re.Pattern | None = None
         self._conjunction_patterns: [re.Pattern] = []
@@ -54,6 +54,7 @@ class Search:
     def _compile_pattern(self, values: list) -> None:
         escaped_strings = []
         for string in values:
+            string = self.replace_local_abbreviation(string)
             conjunction_request = string.split('&&&')
             if len(conjunction_request) > 1:
                 self._compile_conjunction_pattern(conjunction_request)
@@ -67,3 +68,11 @@ class Search:
     def _compile_conjunction_pattern(self, strings: list) -> None:
         patterns = [re.compile(re.escape(string)) for string in strings]
         self._conjunction_patterns.append(patterns)
+
+    @staticmethod
+    def replace_local_abbreviation(string: str, pattern: str = r'(\d+)\s*(BC)', local_ab: str = 'BC') -> str:
+        result = re.search(pattern, string)
+        if result:
+            return string.replace(local_ab, 'до н.э.')
+        else:
+            return string

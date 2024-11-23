@@ -72,25 +72,26 @@ class BooksManager(ORM):
             self.update_last_pk()
 
     # @_synchronized
-    def delete_books(self, ids: list[str]) -> bool:
+    def delete_books(self, ids: list[str]) -> (list, list):
         try:
+            deleted_books = []
+            not_exist_books = []
             books = self.get_all_books()
             for i in ids:
                 deleted_book: dict | None = books.pop(i, None)
                 if deleted_book:
-                    print(f'''Удалена книга 
+                    deleted_books.append(f'''Удалена книга 
                     id: {deleted_book.get('id')} 
                     Название: {deleted_book.get('title')}
                     Автор: {deleted_book.get('author')}
                     Год издания: {deleted_book.get('year')}''')
                 else:
-                    print(f'''Попытка удалить несуществующую книгу с id {i}''')
+                    not_exist_books.append(f'''Попытка удалить несуществующую книгу с id {i}''')
             self._library['books'] = books
             self.update_library_db()
-            return True
+            return deleted_books, not_exist_books
         except Exception as error:
-            print('Произошла ошибка', error, sep='\n')
-            return False
+            return f'Произошла ошибка {error}'
 
     def update_status(self, pk: str, new_status: str) -> str | None:
         try:

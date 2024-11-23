@@ -21,7 +21,7 @@ class AddBookValidator:
             errors.append(book_errors)
         return errors
 
-    def validate_year(self, bc_pattern: str = r'(\d+)\s*(д\.н\.э\.|до\s*н\.э\.)?(.*)') -> None | str:
+    def validate_year(self, bc_pattern: str = r'(\d+)\s*(д\.н\.э\.|до н\.э\.|BC)?(.*)') -> None | str:
         error = 'В значении "Год" Присутствует неизвестный символ, который не является цифрой'
         if self.year == "Неизвестно":
             return None

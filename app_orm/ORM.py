@@ -36,7 +36,7 @@ class BooksManager(ORM):
         self._service_db: Path = DATA_BASE_SERVICE_PATH
         self._library: dict = dict()
 
-    def get_all_books(self) -> list:
+    def get_all_books(self) -> dict:
         if not self._library:
             self._library = self.get_data(self._library_db)
         return self._library.get('books')
@@ -51,7 +51,7 @@ class BooksManager(ORM):
             'status': 'В наличии'
         }
         books = self.get_all_books()
-        books.append(new_book)
+        books[str(last_pk + 1)] = new_book
         self._library['books'] = books
         try:
             self.dump_data(DATA_BASE_LIBRARY_PATH, self._library)
@@ -59,6 +59,9 @@ class BooksManager(ORM):
             print("Произошла ошибка при добавлении книги, обратитесь в технический отдел.", error)
         else:
             self.update_last_pk()
+
+    def delete_books(self, ids: list[int]) -> bool:
+        pass
 
     def update_last_pk(self):
         service_data = self.get_service_data()

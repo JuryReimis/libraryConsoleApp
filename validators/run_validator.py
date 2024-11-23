@@ -37,9 +37,9 @@ class RunValidator:
         last_pk = None
 
         try:
-            books_pk: dict.keys = BooksManager().get_all_books().keys()
+            books_pk: list[int] = list(map(int, BooksManager().get_all_books().keys()))
             if books_pk:
-                max_pk = int(max(books_pk))
+                max_pk = max(books_pk)
                 service_data = orm.get_service_data()
                 if service_data:
                     last_pk = service_data.get('last_generated_pk', None)

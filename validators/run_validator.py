@@ -33,22 +33,24 @@ class RunValidator:
 
     @classmethod
     def check_last_generated_pk(cls):
-        service_file = DATA_BASE_SERVICE_PATH
+        orm = ORM()
         last_pk = None
 
         try:
-            books: list = BooksManager().get_all_books()
-            if books:
-                max_pk = max([book.get('id') for book in books])
-                service_data = ORM.get_data(service_file)
+            books_pk: dict.keys = BooksManager().get_all_books().keys()
+            if books_pk:
+                max_pk = int(max(books_pk))
+                service_data = orm.get_service_data()
                 if service_data:
                     last_pk = service_data.get('last_generated_pk', None)
                 if last_pk is not None:
                     if last_pk != max_pk:
                         service_data['last_generated_pk'] = max_pk
-                        ORM.dump_data(service_file, service_data)
+                        orm.update_service_data(service_data)
                 else:
-                    ORM.dump_data(service_file, cls.service_file_pattern)
+                    new_service_data = cls.service_file_pattern.copy()
+                    new_service_data['last_generated_pk'] = max_pk
+                    orm.update_service_data(new_service_data)
 
         except json.decoder.JSONDecodeError:
             print("База данных библиотеки пуста. Решаю эту проблему")

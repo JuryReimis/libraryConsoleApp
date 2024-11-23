@@ -1,6 +1,7 @@
-import pprint
 
 from app_orm.ORM import BooksManager
+from config import LIBRARY_HEADERS
+from utils.pretty_tables import PrettyTables
 from utils.search import Search
 from validators.add_book_validator import AddBookValidator
 from validators.change_status_validator import ChangeStatusValidator
@@ -13,7 +14,8 @@ class Action:
         try:
             books = self._books_manager.get_all_books()
             if books:
-                return f'{[pprint.pformat(book, sort_dicts=False, indent=4) for book in books.values()]}', True
+                pretty_table = PrettyTables(headers=LIBRARY_HEADERS, table_data=books.values())
+                return pretty_table.get_pretty_table(), True
             else:
                 return "В библиотеке нет книг", True
         except Exception as error:
@@ -56,7 +58,8 @@ class SearchBooksAction(Action):
         search.init_search(self._split_query)
         searched_books = search.get_searched_books()
         if searched_books:
-            return searched_books, True
+            pretty_table = PrettyTables(LIBRARY_HEADERS, searched_books)
+            return pretty_table.get_pretty_table(), True
         return "Не найдено ни одной книги по вашему запросу", False
 
 
@@ -70,7 +73,14 @@ class DeleteBooksByIdAction(Action):
         result = self._books_manager.delete_books(self._ids)
         if isinstance(result, tuple):
             deleted_books, not_exist_books = result[0], result[1]
-            return f'Успешно удалены: {deleted_books}\nНе удалось найти книги: {not_exist_books}', True
+            if deleted_books:
+                pretty_table = PrettyTables(LIBRARY_HEADERS, deleted_books)
+                message = f'Успешно удалены:\n {pretty_table.get_pretty_table()}\n'
+            else:
+                message = ''
+            for book in not_exist_books:
+                message += f'{book}\n'
+            return message, True
         else:
             return "Возникла проблема с удалением", False
 
@@ -87,7 +97,8 @@ class ChangeStatusAction(Action):
             return pk_error, False
         else:
             book = self._books_manager.get_all_books().get(self._pk)
-            message = f'{book}'
+            pretty_table = PrettyTables(LIBRARY_HEADERS, [book])
+            message = pretty_table.get_pretty_table()
             return message, True
 
     def change_status(self, new_status: str) -> (str, bool):

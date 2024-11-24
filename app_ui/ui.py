@@ -4,9 +4,15 @@ from utils.colouring import ConsoleColors
 
 
 class UserInterface:
+    r""" Класс интерфейса пользователя. Его экземпляр дает возможность взаимодействия с программой через консоль.
+    В нем происходит ТОЛЬКО взаимодействие с пользователем и вывод в консоль полученных, в ходе работы программы
+    данных.
+    """
 
     def __init__(self):
-
+        r"""Инициализация базовых атрибутов экземпляра. Инициализация перевода на доступные языки.
+        При невозможности получить файл с константами перевода приложение закрывается.
+        """
 
         # Actions:
         self.__action = Action()
@@ -26,6 +32,9 @@ class UserInterface:
             print()
 
     def init_language(self):
+        r"""Инициализация констант локализации
+        """
+
         language = input(ConsoleColors.colour_text(INIT_MESSAGE, 'CYAN')).strip().upper()
 
         if language not in SUPPORTED_LANGUAGES:
@@ -41,6 +50,10 @@ class UserInterface:
                     self.localization = LocalizationConstants
 
     def request_action(self):
+        r"""Запрос команды на совершение действия.
+        После получения команды происходит перенаправление на соответствующий метод.
+        """
+
         print(ConsoleColors.colour_text(self.localization.FUNCTIONAL_DESCRIPTION, 'blue'), '\n')
 
         action: str = str(
@@ -65,6 +78,8 @@ class UserInterface:
                 self.request_action()
 
     def all(self):
+        r"""Метод, служащий для вывода всей библиотеки в консоль
+        """
         message, response = Action(self.localization).get_all_books()
         if response is True:
             print(message)
@@ -73,6 +88,8 @@ class UserInterface:
         self.request_action()
 
     def add_book(self):
+        r"""Метод, служащий для сбора с пользователя данных, на основе которых будет добавлена новая книга.
+        """
         self.__add_book_action = AddBookAction(self.localization)
         print()
         print(ConsoleColors.colour_bright_text(
@@ -88,6 +105,8 @@ class UserInterface:
         self.request_action()
 
     def search_book(self):
+        r"""Метод, служащий для сбора с пользователя данных, на основе которых будет произведен поиск.
+        """
         print(ConsoleColors.colour_bright_text(self.localization.SEARCH_INFO_MESSAGE, 'GREEN'))
         query = input(ConsoleColors.colour_text(self.localization.INPUT_QUERY_MESSAGE, 'YELLOW'))
         self.__search_book_action = SearchBooksAction(query, self.localization)
@@ -99,6 +118,8 @@ class UserInterface:
         self.request_action()
 
     def delete(self):
+        r"""Метод, служащий для сбора с пользователя данных, на основе которых будет произведено удаление книг.
+        """
         print()
         ids: str = input(ConsoleColors.colour_text(
             self.localization.INPUT_DELETE_IDS_MESSAGE, 'YELLOW'))
@@ -111,6 +132,8 @@ class UserInterface:
         self.request_action()
 
     def change_status(self):
+        r"""Метод, служащий для сбора с пользователя данных о том, статус какой книги необходимо изменить
+        """
         print()
         book_id = input(ConsoleColors.colour_text(
             self.localization.INPUT_CHANGING_BOOK_ID_MESSAGE, 'YELLOW')).strip()
@@ -124,6 +147,8 @@ class UserInterface:
             self.change_status()
 
     def input_status(self):
+        r"""Метод, расширяющий взаимодействие с пользователем на предмет изменения статуса.
+        Собирает данные, на основе которых формируется новый статус книги"""
         print()
         new_status = input(
             ConsoleColors.colour_text(self.localization.INPUT_NEW_STATUS_MESSAGE, 'YELLOW')).strip().lower()

@@ -2,6 +2,13 @@ from utils.colouring import ConsoleColors
 
 
 class PrettyTables:
+    r"""
+    Инструмент написан для красивого вывода табличных значений в консоль.
+    Построен по принципу формирования матрицы. Сначала вычисляются размеры матрицы,
+    после чего формируется пустая матрица. Дальше происходит поэтапное заполнение матрицы данными.
+    В моем случае вычисление происходит посимвольно.
+    """
+
     v_wall = 1
     h_wall = 1
     empty_space = ' '
@@ -43,7 +50,7 @@ class PrettyTables:
         return lens
 
     def create_matrix(self):
-        rows: list[str] = [''.join(self.empty_space for _ in range(self._columns_count)) for row in
+        rows: list[str] = [''.join(self.empty_space for _ in range(self._columns_count)) for _ in
                            range(self._rows_count)]
         self._paint_borders(rows)
         self._paint_headers(rows)

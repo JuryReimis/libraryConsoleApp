@@ -16,6 +16,9 @@ class RunValidator:
 
     @classmethod
     def check_db(cls):
+        r"""Проверяет, доступен ли файл бд и служебных данных.
+        Если нет, то создает их.
+        """
         base_file = DATA_BASE_LIBRARY_PATH
         service_file = DATA_BASE_SERVICE_PATH
         if not base_file.exists():
@@ -34,6 +37,9 @@ class RunValidator:
 
     @classmethod
     def check_last_generated_pk(cls):
+        r"""Проверяет, соответствует ли указанный в служебном файле последний сгенерированный ключ,
+        реально последнему ключу в бд. Если нет - меняет значение в служебных данных
+        """
         orm = ORM()
         last_pk = None
 

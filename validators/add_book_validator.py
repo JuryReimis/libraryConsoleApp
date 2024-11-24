@@ -9,6 +9,8 @@ from validators.base_validator import BaseValidator
 
 
 class AddBookValidator(BaseValidator):
+    r"""Класс для проверки корректности данных при добавлении новой книги
+    """
 
     def __init__(self, title: str = None, author: str = None, year: str = None, localization=None):
         super().__init__(localization)
@@ -17,6 +19,9 @@ class AddBookValidator(BaseValidator):
         self._year = year
 
     def validate_title(self, title) -> str | None:
+        r"""Проверка, существует ли книга с представленным названием в базе данных.
+        Возвращает Ошибку или None
+        """
         self._title = title
         search = Search()
         search.init_search([title])
@@ -30,6 +35,8 @@ class AddBookValidator(BaseValidator):
             return None
 
     def validate(self, author: str) -> None | str:
+        r"""Метод проверяет все данные вместе. Возвращает ошибку или None
+        """
         self._author = author
         search = Search()
         search.init_search(['&&&'.join((self._title, self._author, self._year))])
@@ -41,6 +48,9 @@ class AddBookValidator(BaseValidator):
         return None
 
     def validate_year(self, year: str, bc_pattern: str = r'(\d+)?\s*(д\.н\.э\.|до н\.э\.|BC)?(.*)') -> None | str:
+        r"""Метод проверяет корректность введенного года.
+        Возвращает ошибку или None
+        """
         self._year = year
         error = self._localization.NO_DIGIT_IN_YEAR
         if year == "Неизвестно":

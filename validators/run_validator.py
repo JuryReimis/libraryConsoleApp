@@ -7,7 +7,8 @@ from config import DATA_BASE_LIBRARY_PATH, DATA_BASE_SERVICE_PATH
 class RunValidator:
 
     r"""Валидатор. Должен проверять состояние приложения перед запуском, создает необходимые файлы,
-    в случае их отсутствия"""
+    в случае их отсутствия
+    """
 
     service_file_pattern: dict = {
         'last_generated_pk': 0

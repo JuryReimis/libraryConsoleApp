@@ -1,3 +1,6 @@
+from utils.colouring import ConsoleColors
+
+
 class PrettyTables:
     v_wall = 1
     h_wall = 1
@@ -23,7 +26,7 @@ class PrettyTables:
         self._matrix = None
         self._table_data = table_data
         self._max_lens: list[int] = self.calculate_max_lens()
-        self._columns_count = sum(self._max_lens) + (len(headers) + 1)*self.v_wall
+        self._columns_count = sum(self._max_lens) + (len(headers) + 1) * self.v_wall
         self.create_matrix()
 
     def calculate_max_lens(self) -> list[int]:
@@ -40,7 +43,8 @@ class PrettyTables:
         return lens
 
     def create_matrix(self):
-        rows: list[str] = [''.join(self.empty_space for x in range(self._columns_count)) for row in range(self._rows_count)]
+        rows: list[str] = [''.join(self.empty_space for x in range(self._columns_count)) for row in
+                           range(self._rows_count)]
         self._paint_borders(rows)
         self._paint_headers(rows)
         self._paint_data(rows)
@@ -81,9 +85,18 @@ class PrettyTables:
         row = '|' + row[1:]
         return row
 
+    def _set_colors(self, row: str) -> str:
+        row = ''.join(map(lambda s: ConsoleColors.colour_background(ConsoleColors.colour_bright_text(
+            s, 'BLACK'), 'BLACK'), [letter for letter in row]))
+        return row.replace(
+            self.vertical_line, ConsoleColors.colour_bright_text(self.vertical_line, 'GREEN')
+        ).replace(
+            self.horizontal_line, ConsoleColors.colour_bright_text(self.horizontal_line, 'GREEN')
+        )
+
     def get_pretty_table(self):
         table = ""
         for row in self._matrix:
-            table += f'{row}\n'
+            table += f'{self._set_colors(row)}\n'
 
         return table

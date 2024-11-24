@@ -44,6 +44,15 @@ class BooksManager(ORM):
     def __init__(self):
         self._library_db: Path = DATA_BASE_LIBRARY_PATH
         self._service_db: Path = DATA_BASE_SERVICE_PATH
+        self.localization = None
+
+    def set_localization(self, localization=None):
+
+        if localization is None:
+            from localizations.loc_RU import LocalizationConstants
+            self.localization = LocalizationConstants
+        else:
+            self.localization = localization
 
     # @_synchronized
     def get_all_books(self) -> dict:
@@ -67,7 +76,7 @@ class BooksManager(ORM):
         try:
             self.update_library_db()
         except Exception as error:
-            print("Произошла ошибка при добавлении книги, обратитесь в технический отдел.", error)
+            print(self.localization.ADD_BOOK_ERROR, error)
         else:
             self.update_last_pk()
 
@@ -82,12 +91,12 @@ class BooksManager(ORM):
                 if deleted_book:
                     deleted_books.append(deleted_book)
                 else:
-                    not_exist_books.append(f'''Попытка удалить несуществующую книгу с id {i}''')
+                    not_exist_books.append(f'''{self.localization.TRY_DELETE_NOT_EXIST_ID_ERROR} {i}''')
             self._library['books'] = books
             self.update_library_db()
             return deleted_books, not_exist_books
         except Exception as error:
-            return f'Произошла ошибка {error}'
+            return f'{self.localization.JUST_ERROR}\n{error}'
 
     def update_status(self, pk: str, new_status: str) -> str | None:
         try:
@@ -97,7 +106,7 @@ class BooksManager(ORM):
             self._library['books'] = books
             self.update_library_db()
         except Exception as error:
-            return f"Произошла ошибка, просьба обратиться в технический отдел\n{error}"
+            return f"{self.localization.JUST_ERROR}\n{error}"
         else:
             return None
 

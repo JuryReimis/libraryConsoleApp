@@ -1,4 +1,3 @@
-
 from app_orm.ORM import BooksManager
 from config import LIBRARY_HEADERS
 from utils.colouring import ConsoleColors
@@ -10,6 +9,19 @@ from validators.change_status_validator import ChangeStatusValidator
 
 class Action:
     _books_manager = BooksManager()
+    _localization = None
+    _library_headers = LIBRARY_HEADERS
+
+    def __init__(self, localization=None):
+        self.set_localization(localization)
+
+    def set_localization(self, localization):
+        if localization:
+            self._localization = localization
+        else:
+            from localizations.loc_RU import LocalizationConstants
+            self._localization = LocalizationConstants
+        self._books_manager.set_localization(self._localization)
 
     def get_all_books(self) -> (str, bool):
         try:
@@ -18,16 +30,17 @@ class Action:
                 pretty_table = PrettyTables(headers=LIBRARY_HEADERS, table_data=books.values())
                 return pretty_table.get_pretty_table(), True
             else:
-                return "В библиотеке нет книг", True
+                return ConsoleColors.colour_text(self._localization.EMPTY_LIBRARY_WARNING, 'WHITE'), True
         except Exception as error:
-            return f'Произошла ошибка при обращении к базе данных, обратитесь в технический отдел или повторите попытку\n{error}', False
+            return f'{self._localization.JUST_ERROR}\n{error}', False
 
 
 class AddBookAction(Action):
 
-    def __init__(self):
+    def __init__(self, localization=None):
+        super().__init__(localization)
         self._title = None
-        self._validator = AddBookValidator()
+        self._validator = AddBookValidator(self._localization)
 
     def input_title(self, title: str) -> (str, bool):
         self._title = title
@@ -46,13 +59,14 @@ class AddBookAction(Action):
             return error, False
         year = self._validator.transform_year()
         self._books_manager.add_new_book(self._title, author, year)
-        return "Книга успешно добавлена!", True
+        return self._localization.ADD_BOOK_SUCCESS, True
 
 
 class SearchBooksAction(Action):
 
-    def __init__(self, query: str):
-        self._split_query: list = query.split(';')
+    def __init__(self, query: str, localization=None):
+        super().__init__(localization)
+        self._split_query: list = list(map(lambda q: q.strip(), query.split(';')))
 
     def search(self) -> (str, bool):
         search = Search()
@@ -61,12 +75,13 @@ class SearchBooksAction(Action):
         if searched_books:
             pretty_table = PrettyTables(LIBRARY_HEADERS, searched_books)
             return pretty_table.get_pretty_table(), True
-        return "Не найдено ни одной книги по вашему запросу", False
+        return self._localization.NO_BOOKS_WARNING, False
 
 
 class DeleteBooksByIdAction(Action):
 
-    def __init__(self, ids_string: str):
+    def __init__(self, ids_string: str, localization=None):
+        super().__init__(localization)
         self._ids: list[str] = list(map(lambda pk: pk.strip(), ids_string.split(
             ',')))
 
@@ -77,19 +92,20 @@ class DeleteBooksByIdAction(Action):
             if deleted_books:
                 pretty_table = PrettyTables(LIBRARY_HEADERS, deleted_books)
                 message = f'{ConsoleColors.colour_text(
-                    "Успешно удалены", 'MAGENTA')}:\n{pretty_table.get_pretty_table()}\n'
+                    self._localization.DELETE_BOOKS_SUCCESS, 'MAGENTA')}:\n{pretty_table.get_pretty_table()}\n'
             else:
                 message = ''
             for book in not_exist_books:
                 message += f'{ConsoleColors.colour_text(book, 'RED')}\n'
             return message, True
         else:
-            return "Возникла проблема с удалением", False
+            return self._localization.DELETE_BOOKS_ERROR, False
 
 
 class ChangeStatusAction(Action):
 
-    def __init__(self, pk: str):
+    def __init__(self, pk: str, localization=None):
+        super().__init__(localization)
         self._change_status_validator = ChangeStatusValidator(self._books_manager.get_all_books())
         self._pk = pk
 
@@ -112,8 +128,7 @@ class ChangeStatusAction(Action):
             result = self._books_manager.update_status(self._pk, new_status)
             if result is None:
                 return ConsoleColors.colour_text(
-                    "Изменение статуса прошло успешно", 'MAGENTA'), True
+                    self._localization.CHANGING_STATUS_SUCCESS, 'MAGENTA'), True
             return result, False
         else:
-            return ConsoleColors.colour_text(
-                "Нет данных об id. Обратитесь в технический отдел или попробуйте снова", 'RED'), False
+            return self._localization.CHANGING_STATUS_NO_ID_ERROR, False

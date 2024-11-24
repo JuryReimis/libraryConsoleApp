@@ -16,7 +16,7 @@ INIT_MESSAGE = """\tДля большего удобства, введите, п
 \tFor greater convenience, please input the language you are comfortable with for your work
 \tRU - Русский
 \tEN - English
-\t"""
+\tЗдесь/Here: """
 
 WRONG_LANGUAGE = """\tВведен некорректный язык, повторите попытку
 \tIncorrect language entered, try again"""

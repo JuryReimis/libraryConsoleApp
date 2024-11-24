@@ -30,7 +30,7 @@ class PrettyTables:
         self.create_matrix()
 
     def calculate_max_lens(self) -> list[int]:
-        lens = [0 for i in range(len(self._headers))]
+        lens = [0 for _ in range(len(self._headers))]
         for element in self._table_data:
             for i, value in enumerate(element.values()):
                 lv = len(str(value))
@@ -43,7 +43,7 @@ class PrettyTables:
         return lens
 
     def create_matrix(self):
-        rows: list[str] = [''.join(self.empty_space for x in range(self._columns_count)) for row in
+        rows: list[str] = [''.join(self.empty_space for _ in range(self._columns_count)) for row in
                            range(self._rows_count)]
         self._paint_borders(rows)
         self._paint_headers(rows)
@@ -95,7 +95,7 @@ class PrettyTables:
         )
 
     def get_pretty_table(self):
-        table = ""
+        table = "\n"
         for row in self._matrix:
             table += f'{self._set_colors(row)}\n'
 

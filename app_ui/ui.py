@@ -1,5 +1,6 @@
 from actions.library_actions import Action, ChangeStatusAction, AddBookAction, SearchBooksAction, DeleteBooksByIdAction
 from config import HELLO_MESSAGE, FUNCTIONAL_DESCRIPTION
+from utils.colouring import ConsoleColors
 
 
 class UserInterface:
@@ -13,13 +14,14 @@ class UserInterface:
         self.__delete_book_action = None
         self.__change_status_action = None
 
-        print(HELLO_MESSAGE, '\n')
+        print(ConsoleColors.colour_text(HELLO_MESSAGE, 'GREEN'), '\n')
         self.request_action()
 
     def request_action(self):
-        print(FUNCTIONAL_DESCRIPTION, '\n')
+        print(ConsoleColors.colour_text(FUNCTIONAL_DESCRIPTION, 'blue'), '\n')
 
-        action: str = str(input('Что вы хотите сделать? Введите команду: ', )).lower().strip()
+        action: str = str(
+            input(ConsoleColors.colour_text('\tЧто вы хотите сделать? Введите команду: ', 'GREEN'), )).lower().strip()
 
         match action:
 
@@ -47,22 +49,23 @@ class UserInterface:
     def add_book(self):
         self.__add_book_action = AddBookAction()
         print()
-        print("Для добавления книги последовательно введите название, автора и год издания")
-        title = str(input('Введите название книги: '))
+        print(ConsoleColors.colour_bright_text(
+            "Для добавления книги последовательно введите название, автора и год издания", 'GREEN'))
+        title = str(input(ConsoleColors.colour_text('Введите название книги: ', 'YELLOW')))
         message, response = self.__add_book_action.input_title(title)
         if response is False:
             print(message)
-        author = str(input('Введите автора книги: '))
-        year = str(input('Введите год издания: '))
+        author = str(input(ConsoleColors.colour_text('Введите автора книги: ', 'YELLOW')))
+        year = str(input(ConsoleColors.colour_text('Введите год издания: ', 'YELLOW')))
         message, response = self.__add_book_action.add_book(author, year)
-        print(message)
+        print(ConsoleColors.colour_bright_text(message, 'MAGENTA'))
         self.request_action()
 
     def search_book(self):
-        print("""\nВведите название книги, автора или год издания.
+        print(ConsoleColors.colour_bright_text("""\nВведите название книги, автора или год издания.
          Можете указать несколько значений, разделяя их `;` для глобального поиска
-         Например: Мартин; 1980; Хроники Войны; Прокопий""")
-        query = input("Что ищем: ")
+         Например: Мартин; 1980; Хроники Войны; Прокопий""", 'GREEN'))
+        query = input(ConsoleColors.colour_text("Что ищем: ", 'YELLOW'))
         self.__search_book_action = SearchBooksAction(query)
         message, response = self.__search_book_action.search()
         print(message)
@@ -70,7 +73,8 @@ class UserInterface:
 
     def delete(self):
         print()
-        ids: str = input('Введите id тех книг, которые вы хотите удалить. Разделяйте их запятыми: ')
+        ids: str = input(ConsoleColors.colour_text(
+            'Введите id тех книг, которые вы хотите удалить. Разделяйте их запятыми: ', 'YELLOW'))
         self.__delete_book_action = DeleteBooksByIdAction(ids)
         message, response = self.__delete_book_action.delete()
         print(message)
@@ -78,7 +82,8 @@ class UserInterface:
 
     def change_status(self):
         print()
-        book_id = input('Введите id книги, статус которой хотите поменять: ').strip()
+        book_id = input(ConsoleColors.colour_text(
+            'Введите id книги, статус которой хотите поменять: ', 'YELLOW')).strip()
         self.__change_status_action = ChangeStatusAction(book_id)
         message, response = self.__change_status_action.get_changing_book()
         if response:
@@ -90,7 +95,7 @@ class UserInterface:
 
     def input_status(self):
         print()
-        new_status = input('Введите новый статус: ').strip().lower()
+        new_status = input(ConsoleColors.colour_text('Введите новый статус: ', 'YELLOW')).strip().lower()
         message, response = self.__change_status_action.change_status(new_status)
         if response is True:
             print(message)

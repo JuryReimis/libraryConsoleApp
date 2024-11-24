@@ -6,15 +6,17 @@ DATA_BASE_LIBRARY_PATH: Path = BASE_DIR / 'db/library_db.json'
 
 DATA_BASE_SERVICE_PATH: Path = BASE_DIR / 'db/service_data.json'
 
+SUPPORTED_LANGUAGES = ['RU', 'EN']
+
 LIBRARY_HEADERS = ['ID', 'Название', 'Автор', 'Год публикации', 'Статус']
 
-HELLO_MESSAGE: str = """\tПриветствую вас в приложении для обслуживания библиотеки. Здесь есть несколько функций.
-\tВы можете добавлять книги, удалять их, менять их статус. Вы можете посмотреть полный список всех книг и
-\tнайти все книги по названию, автору и году издания. Приступайте к работе:"""
+DEFAULT_LOCALIZATION = 'RU'
 
-FUNCTIONAL_DESCRIPTION: str = """\tПросмотреть список всех книг: /all
-\tДобавить книгу: /add
-\tУдалить книгу: /delete
-\tПоиск книги: /search
-\tИзменить статус книги: /change-status
-\tВыйти из приложения: /exit"""
+INIT_MESSAGE = """\tДля большего удобства, введите, пожалуйста, язык, который удобен вам для работы.
+\tFor greater convenience, please input the language you are comfortable with for your work
+\tRU - Русский
+\tEN - English
+\t"""
+
+WRONG_LANGUAGE = """\tВведен некорректный язык, повторите попытку
+\tIncorrect language entered, try again"""

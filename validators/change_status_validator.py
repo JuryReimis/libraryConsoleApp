@@ -1,16 +1,20 @@
-class ChangeStatusValidator:
+from validators.base_validator import BaseValidator
 
-    def __init__(self, books: dict):
+
+class ChangeStatusValidator(BaseValidator):
+
+    def __init__(self, books: dict, localization=None):
+        super().__init__(localization)
         self._books = books
         self._allowed_statuses = ['в наличии', 'выдана']
 
     def validate_pk(self, pk) -> str | None:
         if pk not in self._books.keys():
-            return "В базе данных нет книг с указанным id: " + pk
+            return self._localization.NO_BOOKS_WITH_INPUT_ID_ERROR + pk
         else:
             return None
 
     def validate_status(self, new_status: str):
         if new_status in self._allowed_statuses:
             return None
-        return "Введенный статус не является разрешенным, повторите попытку"
+        return self._localization.NOT_ALLOWED_STATUS_ERROR

@@ -1,6 +1,7 @@
 
 from app_orm.ORM import BooksManager
 from config import LIBRARY_HEADERS
+from utils.colouring import ConsoleColors
 from utils.pretty_tables import PrettyTables
 from utils.search import Search
 from validators.add_book_validator import AddBookValidator
@@ -75,11 +76,12 @@ class DeleteBooksByIdAction(Action):
             deleted_books, not_exist_books = result[0], result[1]
             if deleted_books:
                 pretty_table = PrettyTables(LIBRARY_HEADERS, deleted_books)
-                message = f'Успешно удалены:\n {pretty_table.get_pretty_table()}\n'
+                message = f'{ConsoleColors.colour_text(
+                    "Успешно удалены", 'MAGENTA')}:\n{pretty_table.get_pretty_table()}\n'
             else:
                 message = ''
             for book in not_exist_books:
-                message += f'{book}\n'
+                message += f'{ConsoleColors.colour_text(book, 'RED')}\n'
             return message, True
         else:
             return "Возникла проблема с удалением", False
@@ -94,12 +96,12 @@ class ChangeStatusAction(Action):
     def get_changing_book(self) -> (str, bool):
         pk_error = self._change_status_validator.validate_pk(self._pk)
         if pk_error:
-            return pk_error, False
+            return ConsoleColors.colour_text(pk_error, 'RED'), False
         else:
             book = self._books_manager.get_all_books().get(self._pk)
             pretty_table = PrettyTables(LIBRARY_HEADERS, [book])
             message = pretty_table.get_pretty_table()
-            return message, True
+            return ConsoleColors.colour_text(message, 'MAGENTA'), True
 
     def change_status(self, new_status: str) -> (str, bool):
         if self._pk:
@@ -109,7 +111,9 @@ class ChangeStatusAction(Action):
 
             result = self._books_manager.update_status(self._pk, new_status)
             if result is None:
-                return "Изменение статуса прошло успешно", True
+                return ConsoleColors.colour_text(
+                    "Изменение статуса прошло успешно", 'MAGENTA'), True
             return result, False
         else:
-            return "Нет данных об id. Обратитесь в технический отдел или попробуйте снова", False
+            return ConsoleColors.colour_text(
+                "Нет данных об id. Обратитесь в технический отдел или попробуйте снова", 'RED'), False
